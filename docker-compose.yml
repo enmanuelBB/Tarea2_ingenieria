@@ -1,43 +1,53 @@
 version: '3.8'
 
 services:
-  # 1. Base de Datos MySQL
+
   mysqldb:
     image: mysql:8.0
     container_name: muebleria_db_container
     restart: always
     environment:
+      #variables  archivo .env
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3307:3306" # Mapeamos al 3307 externo para no chocar con tu XAMPP local
+      - "3307:3306"
     volumes:
-      - db_data:/var/lib/mysql # Persistencia de datos
+      - db_data:/var/lib/mysql
 
-  # 2. Backend (Spring Boot)
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
   backend:
-    build: ./backend # Busca el Dockerfile en la carpeta backend
+    build: ./backend
     container_name: muebleria_backend_container
+    restart: on-failure
     depends_on:
-      - mysqldb # Espera a que la BD inicie
+      mysqldb:
+        condition: service_healthy
     environment:
-      # OJO AQUÍ: Dentro de Docker, el host NO es 'localhost', es el nombre del servicio 'mysqldb'
+      # Sobrescribimos la URL para usar el nombre del servicio 'mysqldb' en lugar de 'localhost'
       SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8080:8080"
 
-  # 3. Frontend (React + Nginx)
+
   frontend:
-    build: ./frontend # Busca el Dockerfile en la carpeta frontend
+    build: ./frontend
     container_name: muebleria_frontend_container
+    restart: always
     depends_on:
       - backend
     ports:
-      - "80:80" # Podrás ver la web en http://localhost
+      - "8081:80"
 
 volumes:
   db_data:

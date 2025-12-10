@@ -1,31 +1,31 @@
 export interface Variant {
-  id: string;
-  name: string;
-  priceIncrease: number;
+    idVariante: number;
+    nombre: string;
+    aumentoPrecio: number;
 }
 
 export interface Furniture {
-  id: string;
-  name: string;
-  type: 'Silla' | 'Mesa' | 'Sofá' | 'Escritorio' | 'Estantería';
-  material: string;
-  size: 'Grande' | 'Mediano' | 'Pequeño';
-  basePrice: number;
-  stock: number;
-  image: string;
-  status: 'Active' | 'Inactive';
+    idMueble: number;
+    nombreMueble: string;
+    tipo: string;
+    material: string;
+    tamanio: string;
+    precioBase: number;
+    stock: number;
+    estado: string;
+    image?: string;
 }
 
 export interface QuoteItem {
-  furniture: Furniture;
-  variant: Variant;
-  quantity: number;
+    furniture: Furniture;
+    variant: Variant;
+    quantity: number;
 }
 
 export interface Quote {
-  id: string;
-  date: string;
-  items: QuoteItem[];
-  total: number;
-  status: 'Pending' | 'Confirmed';
+    idCotizacion: number;
+    fecha: string;
+    detalles: any[];
+    total: number;
+    estado: 'PENDIENTE' | 'CONFIRMADA'; // Antes Pending | Confirmed
 }

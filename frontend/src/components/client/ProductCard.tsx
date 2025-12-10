@@ -1,89 +1,92 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { Furniture, Variant } from '../../types';
+import { Furniture, Variant } from '../../types/furniture';
 
 interface ProductCardProps {
-  furniture: Furniture;
-  variants: Variant[];
-  onAddToQuote: (furniture: Furniture, variant: Variant) => void;
+    furniture: Furniture;
+    variants: Variant[];
+    onAddToQuote: (furniture: Furniture, variant: Variant) => void;
 }
 
 export function ProductCard({ furniture, variants, onAddToQuote }: ProductCardProps) {
-  const [selectedVariant, setSelectedVariant] = useState<Variant>(variants[0]);
+    // Inicializamos con la primera variante si existe
+    const [selectedVariant, setSelectedVariant] = useState<Variant>(variants[0] || null);
 
-  const finalPrice = furniture.basePrice + selectedVariant.priceIncrease;
-  const hasVariantIncrease = selectedVariant.priceIncrease > 0;
+    if (!selectedVariant) return null; // Protección por si no hay variantes cargadas
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-      <div className="aspect-[4/3] overflow-hidden bg-gray-100">
-        <img
-          src={furniture.image}
-          alt={furniture.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-        />
-      </div>
-      
-      <div className="p-4">
-        <div className="flex gap-2 mb-2">
-          <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded">
-            {furniture.type}
+    const finalPrice = furniture.precioBase + selectedVariant.aumentoPrecio;
+    const hasVariantIncrease = selectedVariant.aumentoPrecio > 0;
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+                <img
+                    src={furniture.image}
+                    alt={furniture.nombreMueble}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+            </div>
+
+            <div className="p-4">
+                <div className="flex gap-2 mb-2">
+          <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded uppercase">
+            {furniture.tipo}
           </span>
-          <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-            {furniture.size}
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded uppercase">
+            {furniture.tamanio}
           </span>
-        </div>
-        
-        <h3 className="text-gray-900 mb-2">{furniture.name}</h3>
-        
-        <div className="mb-3">
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl text-gray-900">${finalPrice.toLocaleString()}</span>
-            {hasVariantIncrease && (
-              <span className="text-sm text-gray-500 line-through">
-                ${furniture.basePrice.toLocaleString()}
+                </div>
+
+                <h3 className="text-gray-900 mb-2 font-medium">{furniture.nombreMueble}</h3>
+
+                <div className="mb-3">
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-2xl text-gray-900">${finalPrice.toLocaleString()}</span>
+                        {hasVariantIncrease && (
+                            <span className="text-sm text-gray-500 line-through">
+                ${furniture.precioBase.toLocaleString()}
               </span>
-            )}
-          </div>
-          {hasVariantIncrease && (
-            <span className="text-xs text-emerald-600">
-              +${selectedVariant.priceIncrease.toLocaleString()} por {selectedVariant.name}
+                        )}
+                    </div>
+                    {hasVariantIncrease && (
+                        <span className="text-xs text-emerald-600">
+              +${selectedVariant.aumentoPrecio.toLocaleString()} por {selectedVariant.nombre}
             </span>
-          )}
-        </div>
+                    )}
+                </div>
 
-        <div className="mb-3">
-          <label className="block text-sm text-gray-700 mb-1">Variante</label>
-          <select
-            value={selectedVariant.id}
-            onChange={(e) => {
-              const variant = variants.find(v => v.id === e.target.value);
-              if (variant) setSelectedVariant(variant);
-            }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
-            {variants.map(variant => (
-              <option key={variant.id} value={variant.id}>
-                {variant.name}
-                {variant.priceIncrease > 0 && ` (+$${variant.priceIncrease})`}
-              </option>
-            ))}
-          </select>
-        </div>
+                <div className="mb-3">
+                    <label className="block text-sm text-gray-700 mb-1">Variante</label>
+                    <select
+                        value={selectedVariant.idVariante}
+                        onChange={(e) => {
+                            const variant = variants.find(v => v.idVariante === Number(e.target.value));
+                            if (variant) setSelectedVariant(variant);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                        {variants.map(variant => (
+                            <option key={variant.idVariante} value={variant.idVariante}>
+                                {variant.nombre}
+                                {variant.aumentoPrecio > 0 && ` (+$${variant.aumentoPrecio})`}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-        <button
-          onClick={() => onAddToQuote(furniture, selectedVariant)}
-          disabled={furniture.stock === 0}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          {furniture.stock === 0 ? 'Sin Stock' : 'Agregar a Cotización'}
-        </button>
-        
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Stock disponible: {furniture.stock}
-        </p>
-      </div>
-    </div>
-  );
+                <button
+                    onClick={() => onAddToQuote(furniture, selectedVariant)}
+                    disabled={furniture.stock === 0}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                    <Plus className="w-4 h-4" />
+                    {furniture.stock === 0 ? 'Sin Stock' : 'Agregar a Cotización'}
+                </button>
+
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                    Stock disponible: {furniture.stock}
+                </p>
+            </div>
+        </div>
+    );
 }

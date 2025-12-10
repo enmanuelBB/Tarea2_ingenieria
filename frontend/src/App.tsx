@@ -1,258 +1,258 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from './api/axiosConfig';
 import { Furniture, Variant, Quote, QuoteItem } from './types/furniture';
 import { ClientCatalog } from './components/ClientCatalog';
 import { QuoteView } from './components/QuoteView';
 import { AdminDashboard } from './components/AdminDashboard';
 
-// Initial sample data
-const INITIAL_FURNITURE: Furniture[] = [
-  {
-    id: '1',
-    name: 'Silla Clásica de Roble',
-    type: 'Silla',
-    material: 'Roble',
-    size: 'Mediano',
-    basePrice: 12000,
-    stock: 15,
-    image: 'https://images.unsplash.com/photo-1702018706865-e5306a8fa007?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b29kZW4lMjBjaGFpciUyMGZ1cm5pdHVyZXxlbnwxfHx8fDE3NjUzMjA5MjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  },
-  {
-    id: '2',
-    name: 'Mesa de Comedor Grande',
-    type: 'Mesa',
-    material: 'Nogal',
-    size: 'Grande',
-    basePrice: 45000,
-    stock: 8,
-    image: 'https://images.unsplash.com/photo-1722084059243-b0ec46398446?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b29kZW4lMjB0YWJsZSUyMGZ1cm5pdHVyZXxlbnwxfHx8fDE3NjUzMDAzNjR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  },
-  {
-    id: '3',
-    name: 'Sofá Moderno 3 Cuerpos',
-    type: 'Sofá',
-    material: 'Tela Premium',
-    size: 'Grande',
-    basePrice: 85000,
-    stock: 5,
-    image: 'https://images.unsplash.com/photo-1763565909003-46e9dfb68a00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzb2ZhJTIwZnVybml0dXJlfGVufDF8fHx8MTc2NTI3MjY3MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  },
-  {
-    id: '4',
-    name: 'Escritorio Ejecutivo',
-    type: 'Escritorio',
-    material: 'Pino',
-    size: 'Grande',
-    basePrice: 38000,
-    stock: 12,
-    image: 'https://images.unsplash.com/photo-1679309981674-cef0e23a7864?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b29kZW4lMjBkZXNrJTIwZnVybml0dXJlfGVufDF8fHx8MTc2NTMyMTE5Mnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  },
-  {
-    id: '5',
-    name: 'Estantería Biblioteca',
-    type: 'Estantería',
-    material: 'Roble',
-    size: 'Grande',
-    basePrice: 32000,
-    stock: 7,
-    image: 'https://images.unsplash.com/photo-1473447216727-44efba8cf0e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29rc2hlbGYlMjBmdXJuaXR1cmV8ZW58MXx8fHwxNzY1MjY1MjM4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  },
-  {
-    id: '6',
-    name: 'Silla de Comedor Premium',
-    type: 'Silla',
-    material: 'Nogal',
-    size: 'Mediano',
-    basePrice: 15000,
-    stock: 3,
-    image: 'https://images.unsplash.com/photo-1758977403826-01e2c8a3f68f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaW5pbmclMjBjaGFpciUyMHdvb2RlbnxlbnwxfHx8fDE3NjUzMjExOTJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    status: 'Active'
-  }
-];
-
-const INITIAL_VARIANTS: Variant[] = [
-  { id: '1', name: 'Normal', priceIncrease: 0 },
-  { id: '2', name: 'Barniz Premium', priceIncrease: 3500 },
-  { id: '3', name: 'Acabado Mate', priceIncrease: 2000 }
-];
-
 export default function App() {
-  const [view, setView] = useState<'catalog' | 'quote' | 'admin'>('catalog');
-  const [furniture, setFurniture] = useState<Furniture[]>(INITIAL_FURNITURE);
-  const [variants, setVariants] = useState<Variant[]>(INITIAL_VARIANTS);
-  const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([]);
-  const [quotes, setQuotes] = useState<Quote[]>([]);
+    const [view, setView] = useState<'catalog' | 'quote' | 'admin'>('catalog');
 
-  // Furniture management
-  const handleAddFurniture = (newFurniture: Omit<Furniture, 'id'>) => {
-    const id = String(Date.now());
-    setFurniture([...furniture, { ...newFurniture, id }]);
-  };
+    // Estado de datos (vienen del Backend)
+    const [furniture, setFurniture] = useState<Furniture[]>([]);
+    const [variants, setVariants] = useState<Variant[]>([]);
+    const [quotes, setQuotes] = useState<Quote[]>([]);
 
-  const handleUpdateFurniture = (id: string, updates: Partial<Furniture>) => {
-    setFurniture(furniture.map(item => 
-      item.id === id ? { ...item, ...updates } : item
-    ));
-  };
+    // Estado del carrito (Local)
+    const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  const handleDeleteFurniture = (id: string) => {
-    if (confirm('¿Está seguro de eliminar este mueble?')) {
-      setFurniture(furniture.filter(item => item.id !== id));
-    }
-  };
+    // --- 1. CARGA DE DATOS INICIALES ---
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [furnitureRes, variantsRes, quotesRes] = await Promise.all([
+                api.get('/muebles'),
+                api.get('/variantes'),
+                api.get('/cotizaciones')
+            ]);
 
-  // Variant management
-  const handleAddVariant = (newVariant: Omit<Variant, 'id'>) => {
-    const id = String(Date.now());
-    setVariants([...variants, { ...newVariant, id }]);
-  };
+            // Agregamos imágenes placeholder porque el backend no las tiene
+            const furnitureWithImages = furnitureRes.data.map((item: Furniture) => ({
+                ...item,
+                image: getImageForType(item.tipo)
+            }));
 
-  const handleDeleteVariant = (id: string) => {
-    if (id === '1') {
-      alert('No se puede eliminar la variante Normal');
-      return;
-    }
-    if (confirm('¿Está seguro de eliminar esta variante?')) {
-      setVariants(variants.filter(v => v.id !== id));
-    }
-  };
-
-  // Quote management
-  const handleAddToQuote = (furnitureItem: Furniture, variant: Variant) => {
-    const existingIndex = quoteItems.findIndex(
-      item => item.furniture.id === furnitureItem.id && item.variant.id === variant.id
-    );
-
-    if (existingIndex >= 0) {
-      const newItems = [...quoteItems];
-      if (newItems[existingIndex].quantity < furnitureItem.stock) {
-        newItems[existingIndex].quantity += 1;
-        setQuoteItems(newItems);
-      } else {
-        alert('No hay suficiente stock disponible');
-      }
-    } else {
-      setQuoteItems([...quoteItems, {
-        furniture: furnitureItem,
-        variant,
-        quantity: 1
-      }]);
-    }
-  };
-
-  const handleUpdateQuantity = (index: number, delta: number) => {
-    const newItems = [...quoteItems];
-    const newQuantity = newItems[index].quantity + delta;
-    
-    if (newQuantity > 0 && newQuantity <= newItems[index].furniture.stock) {
-      newItems[index].quantity = newQuantity;
-      setQuoteItems(newItems);
-    }
-  };
-
-  const handleRemoveItem = (index: number) => {
-    setQuoteItems(quoteItems.filter((_, i) => i !== index));
-  };
-
-  const handleSubmitQuote = () => {
-    if (quoteItems.length === 0) return;
-
-    const total = quoteItems.reduce((sum, item) => {
-      const itemPrice = item.furniture.basePrice + item.variant.priceIncrease;
-      return sum + (itemPrice * item.quantity);
-    }, 0);
-
-    const newQuote: Quote = {
-      id: String(Date.now()),
-      date: new Date().toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-      items: [...quoteItems],
-      total,
-      status: 'Pending'
+            setFurniture(furnitureWithImages);
+            setVariants(variantsRes.data);
+            setQuotes(quotesRes.data);
+        } catch (error) {
+            console.error("Error conectando al backend:", error);
+            // Opcional: Mostrar alerta si falla la conexión
+        } finally {
+            setLoading(false);
+        }
     };
 
-    setQuotes([...quotes, newQuote]);
-    setQuoteItems([]);
-    alert('¡Cotización enviada exitosamente! Un representante se pondrá en contacto pronto.');
-    setView('catalog');
-  };
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-  const handleConfirmSale = (quoteId: string) => {
-    const quote = quotes.find(q => q.id === quoteId);
-    if (!quote) return;
+    // Helper para imágenes (Frontend only)
+    const getImageForType = (type: string) => {
+        const images: Record<string, string> = {
+            'Silla': 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=1000',
+            'Mesa': 'https://images.unsplash.com/photo-1577140917170-285929d55716?auto=format&fit=crop&q=80&w=1000',
+            'Sofá': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1000',
+            'Escritorio': 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=1000',
+            'Estantería': 'https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&q=80&w=1000'
+        };
+        return images[type] || 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&q=80&w=1000';
+    };
 
-    // Update stock
-    const updatedFurniture = [...furniture];
-    quote.items.forEach(item => {
-      const furnitureIndex = updatedFurniture.findIndex(f => f.id === item.furniture.id);
-      if (furnitureIndex >= 0) {
-        updatedFurniture[furnitureIndex].stock -= item.quantity;
-      }
-    });
+    // --- 2. GESTIÓN DE MUEBLES (ADMIN) ---
+    const handleAddFurniture = async (newFurniture: any) => {
+        try {
 
-    setFurniture(updatedFurniture);
-    setQuotes(quotes.map(q => 
-      q.id === quoteId ? { ...q, status: 'Confirmed' as const } : q
-    ));
+            const { image, idMueble, ...rest } = newFurniture;
 
-    alert('¡Venta confirmada! El stock ha sido actualizado.');
-  };
+            const payload = {
+                ...rest,
 
-  return (
-    <div className="min-h-screen">
-      {/* Admin Access Button (hidden in production, for demo purposes) */}
-      {view !== 'admin' && (
-        <button
-          onClick={() => setView('admin')}
-          className="fixed bottom-4 left-4 bg-neutral-800 text-white px-4 py-2 rounded-md text-sm z-50 hover:bg-neutral-700"
-        >
-          Admin Panel
-        </button>
-      )}
+                tamanio: rest.tamanio.toUpperCase(),
+                tipo: rest.tipo, // Tal cual como viene del select
+                estado: rest.estado || 'ACTIVO'
+            };
 
-      {view === 'catalog' && (
-        <ClientCatalog
-          furniture={furniture}
-          variants={variants}
-          quoteItems={quoteItems}
-          onAddToQuote={handleAddToQuote}
-          onViewQuote={() => setView('quote')}
-        />
-      )}
+            console.log("Enviando al backend:", payload); // Para que veas en consola qué mandas
 
-      {view === 'quote' && (
-        <QuoteView
-          quoteItems={quoteItems}
-          onBack={() => setView('catalog')}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onSubmitQuote={handleSubmitQuote}
-        />
-      )}
+            await api.post('/muebles', payload);
+            alert('Mueble creado con éxito');
+            fetchData(); // Recargar datos
+        } catch (error: any) {
+            console.error("Error detallado:", error.response?.data); // Ver error real en consola
+            alert(`Error al crear mueble: ${error.response?.data?.message || 'Revisa la consola'}`);
+        }
+    };
 
-      {view === 'admin' && (
-        <AdminDashboard
-          furniture={furniture}
-          variants={variants}
-          quotes={quotes}
-          onAddFurniture={handleAddFurniture}
-          onUpdateFurniture={handleUpdateFurniture}
-          onDeleteFurniture={handleDeleteFurniture}
-          onAddVariant={handleAddVariant}
-          onDeleteVariant={handleDeleteVariant}
-          onConfirmSale={handleConfirmSale}
-          onBackToCatalog={() => setView('catalog')}
-        />
-      )}
-    </div>
-  );
+    const handleUpdateFurniture = async (id: number, updates: Partial<Furniture>) => {
+        try {
+            await api.patch(`/muebles/${id}`, updates);
+            fetchData();
+        } catch (error) {
+            alert('Error al actualizar');
+            console.error(error);
+        }
+    };
+
+    const handleDeleteFurniture = async (id: number) => {
+        if (confirm('¿Está seguro de desactivar este mueble?')) {
+            try {
+                await api.delete(`/muebles/${id}`); // Esto lo desactiva en el backend
+                fetchData();
+            } catch (error) {
+                alert('Error al desactivar mueble');
+                console.error(error);
+            }
+        }
+    };
+
+    // --- 3. GESTIÓN DE VARIANTES (ADMIN) ---
+    const handleAddVariant = async (newVariant: any) => {
+        try {
+            await api.post('/variantes', newVariant);
+            fetchData();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDeleteVariant = (id: number) => {
+        alert("La eliminación de variantes no está implementada en esta demo.");
+    };
+
+    // --- 4. GESTIÓN DE COTIZACIONES (CLIENTE) ---
+    const handleAddToQuote = (furnitureItem: Furniture, variant: Variant) => {
+        setQuoteItems(prev => {
+            const existingIndex = prev.findIndex(
+                item => item.furniture.idMueble === furnitureItem.idMueble && item.variant.idVariante === variant.idVariante
+            );
+
+            if (existingIndex >= 0) {
+                const newItems = [...prev];
+                // Validamos contra el stock real que viene de la BD
+                if (newItems[existingIndex].quantity < furnitureItem.stock) {
+                    newItems[existingIndex].quantity += 1;
+                    return newItems;
+                } else {
+                    alert('No hay suficiente stock disponible');
+                    return prev;
+                }
+            } else {
+                return [...prev, {
+                    furniture: furnitureItem,
+                    variant,
+                    quantity: 1
+                }];
+            }
+        });
+    };
+
+    const handleUpdateQuantity = (index: number, delta: number) => {
+        const newItems = [...quoteItems];
+        const newQuantity = newItems[index].quantity + delta;
+
+        if (newQuantity > 0 && newQuantity <= newItems[index].furniture.stock) {
+            newItems[index].quantity = newQuantity;
+            setQuoteItems(newItems);
+        }
+    };
+
+    const handleRemoveItem = (index: number) => {
+        setQuoteItems(quoteItems.filter((_, i) => i !== index));
+    };
+
+    const handleSubmitQuote = async () => {
+        if (quoteItems.length === 0) return;
+
+        // Preparamos el JSON exacto que pide el Backend
+        const payload = {
+            detalles: quoteItems.map(item => ({
+                idMueble: item.furniture.idMueble,
+                idVariante: item.variant.idVariante,
+                cantidad: item.quantity
+            }))
+        };
+
+        try {
+            await api.post('/cotizaciones', payload);
+            alert('¡Cotización enviada exitosamente!');
+            setQuoteItems([]); // Limpiar carrito
+            setView('catalog');
+            fetchData(); // Recargar para actualizar listas de admin
+        } catch (error) {
+            alert('Error al enviar la cotización.');
+            console.error(error);
+        }
+    };
+
+    // --- 5. CONFIRMACIÓN DE VENTA (ADMIN) ---
+    const handleConfirmSale = async (quoteId: number) => {
+        try {
+            // Llamamos al endpoint que descuenta stock
+            await api.post(`/cotizaciones/${quoteId}/confirmar`);
+            alert('¡Venta confirmada! Stock descontado.');
+            fetchData(); // Recargar para ver el stock actualizado y el estado de la cotización
+        } catch (error: any) {
+            // Mostramos el mensaje de error del backend (ej: "Stock insuficiente")
+            const msg = error.response?.data?.message || 'Error al confirmar venta';
+            alert(msg);
+        }
+    };
+
+    // --- RENDER ---
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Cargando sistema...</div>;
+    }
+
+    return (
+        <div className="min-h-screen font-sans text-gray-900">
+            {/* Botón Flotante Admin (Gustavo) */}
+            {view !== 'admin' && (
+                <button
+                    onClick={() => setView('admin')}
+                    style={{ zIndex: 9999 }} // Forzamos que esté siempre arriba
+                    className="fixed bottom-6 left-6 bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl border-2 border-white hover:bg-gray-800 transition-all flex items-center gap-2"
+                >
+                    👮 Panel Admin
+                </button>
+            )}
+
+            {view === 'catalog' && (
+                <ClientCatalog
+                    furniture={furniture}
+                    variants={variants}
+                    quoteItems={quoteItems}
+                    onAddToQuote={handleAddToQuote}
+                    onViewQuote={() => setView('quote')}
+                />
+            )}
+
+            {view === 'quote' && (
+                <QuoteView
+                    quoteItems={quoteItems}
+                    onBack={() => setView('catalog')}
+                    onUpdateQuantity={handleUpdateQuantity}
+                    onRemoveItem={handleRemoveItem}
+                    onSubmitQuote={handleSubmitQuote}
+                />
+            )}
+
+            {view === 'admin' && (
+                <AdminDashboard
+                    furniture={furniture}
+                    variants={variants}
+                    quotes={quotes}
+                    onAddFurniture={handleAddFurniture}
+                    onUpdateFurniture={handleUpdateFurniture}
+                    onDeleteFurniture={handleDeleteFurniture}
+                    onAddVariant={handleAddVariant}
+                    onDeleteVariant={handleDeleteVariant}
+                    onConfirmSale={handleConfirmSale}
+                    onBackToCatalog={() => setView('catalog')}
+                />
+            )}
+        </div>
+    );
 }
