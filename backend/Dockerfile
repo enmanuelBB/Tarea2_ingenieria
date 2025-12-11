@@ -1,7 +1,4 @@
-# -------------------------------------------------------------------
-# ETAPA 1: Construcción (Build)
-# CAMBIO: Usamos una imagen con Maven y Java 21
-# -------------------------------------------------------------------
+
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
@@ -13,10 +10,7 @@ COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-# -------------------------------------------------------------------
-# ETAPA 2: Ejecución (Run)
-# CAMBIO: Usamos una imagen ligera de Java 21
-# -------------------------------------------------------------------
+
 FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app

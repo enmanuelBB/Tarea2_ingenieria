@@ -35,15 +35,15 @@ public class DataLoader implements CommandLineRunner {
         if (varianteRepository.count() == 0) {
             Variante v1 = new Variante();
             v1.setNombre("Normal");
-            v1.setAumentoPrecio(0.0); // <--- Agregamos .0
+            v1.setAumentoPrecio(0.0);
 
             Variante v2 = new Variante();
             v2.setNombre("Barniz Premium");
-            v2.setAumentoPrecio(3500.0); // <--- Agregamos .0
+            v2.setAumentoPrecio(3500.0);
 
             Variante v3 = new Variante();
             v3.setNombre("Acabado Mate");
-            v3.setAumentoPrecio(2000.0); // <--- Agregamos .0
+            v3.setAumentoPrecio(2000.0);
 
             varianteRepository.saveAll(Arrays.asList(v1, v2, v3));
             System.out.println("✅ Variantes precargadas exitosamente");
@@ -57,7 +57,7 @@ public class DataLoader implements CommandLineRunner {
             m1.setNombreMueble("Silla de Roble");
             m1.setTipo("Silla");
             m1.setMaterial("Roble");
-            m1.setPrecioBase(15000.0); // <--- Agregamos .0
+            m1.setPrecioBase(15000.0);
             m1.setStock(20);
             m1.setTamanio(TamanioMueble.MEDIANO);
             m1.setEstado(EstadoMueble.ACTIVO);
@@ -67,7 +67,7 @@ public class DataLoader implements CommandLineRunner {
             m2.setNombreMueble("Mesa Comedor Familiar");
             m2.setTipo("Mesa");
             m2.setMaterial("Pino");
-            m2.setPrecioBase(85000.0); // <--- Agregamos .0
+            m2.setPrecioBase(85000.0);
             m2.setStock(5);
             m2.setTamanio(TamanioMueble.GRANDE);
             m2.setEstado(EstadoMueble.ACTIVO);
@@ -77,13 +77,13 @@ public class DataLoader implements CommandLineRunner {
             m3.setNombreMueble("Sofá 3 Cuerpos");
             m3.setTipo("Sofá");
             m3.setMaterial("Tela Premium");
-            m3.setPrecioBase(120000.0); // <--- Agregamos .0
+            m3.setPrecioBase(120000.0);
             m3.setStock(3);
             m3.setTamanio(TamanioMueble.GRANDE);
             m3.setEstado(EstadoMueble.ACTIVO);
 
             muebleRepository.saveAll(Arrays.asList(m1, m2, m3));
-            System.out.println("✅ Muebles precargados exitosamente");
+            System.out.println("Muebles precargados exitosamente");
         }
     }
 }

@@ -9,17 +9,16 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ furniture, variants, onAddToQuote }: ProductCardProps) {
-    // Estado seguro: Si hay variantes, usa la primera. Si no, null.
+
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
-    // Efecto para seleccionar la primera variante automáticamente cuando carguen los datos
+
     useEffect(() => {
         if (variants && variants.length > 0) {
             setSelectedVariant(variants[0]);
         }
     }, [variants]);
 
-    // Si el mueble está inactivo, no lo mostramos (o podrías mostrarlo gris)
     if (furniture.estado === 'INACTIVO') return null;
 
     // Cálculos seguros

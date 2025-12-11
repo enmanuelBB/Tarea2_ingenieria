@@ -8,16 +8,16 @@ import { AdminDashboard } from './components/AdminDashboard';
 export default function App() {
     const [view, setView] = useState<'catalog' | 'quote' | 'admin'>('catalog');
 
-    // Estado de datos (vienen del Backend)
+
     const [furniture, setFurniture] = useState<Furniture[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
     const [quotes, setQuotes] = useState<Quote[]>([]);
 
-    // Estado del carrito (Local)
+
     const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // --- 1. CARGA DE DATOS INICIALES ---
+
     const fetchData = async () => {
         try {
             setLoading(true);
@@ -27,7 +27,7 @@ export default function App() {
                 api.get('/cotizaciones')
             ]);
 
-            // Agregamos imágenes placeholder porque el backend no las tiene
+
             const furnitureWithImages = furnitureRes.data.map((item: Furniture) => ({
                 ...item,
                 image: getImageForType(item.tipo)
@@ -38,7 +38,7 @@ export default function App() {
             setQuotes(quotesRes.data);
         } catch (error) {
             console.error("Error conectando al backend:", error);
-            // Opcional: Mostrar alerta si falla la conexión
+
         } finally {
             setLoading(false);
         }
@@ -48,7 +48,7 @@ export default function App() {
         fetchData();
     }, []);
 
-    // Helper para imágenes (Frontend only)
+
     const getImageForType = (type: string) => {
         const images: Record<string, string> = {
             'Silla': 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=1000',
@@ -60,7 +60,7 @@ export default function App() {
         return images[type] || 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&q=80&w=1000';
     };
 
-    // --- 2. GESTIÓN DE MUEBLES (ADMIN) ---
+
     const handleAddFurniture = async (newFurniture: any) => {
         try {
 
@@ -70,11 +70,11 @@ export default function App() {
                 ...rest,
 
                 tamanio: rest.tamanio.toUpperCase(),
-                tipo: rest.tipo, // Tal cual como viene del select
+                tipo: rest.tipo, 
                 estado: rest.estado || 'ACTIVO'
             };
 
-            console.log("Enviando al backend:", payload); // Para que veas en consola qué mandas
+            console.log("Enviando al backend:", payload);
 
             await api.post('/muebles', payload);
             alert('Mueble creado con éxito');
@@ -98,7 +98,7 @@ export default function App() {
     const handleDeleteFurniture = async (id: number) => {
         if (confirm('¿Está seguro de desactivar este mueble?')) {
             try {
-                await api.delete(`/muebles/${id}`); // Esto lo desactiva en el backend
+                await api.delete(`/muebles/${id}`);
                 fetchData();
             } catch (error) {
                 alert('Error al desactivar mueble');
@@ -107,7 +107,7 @@ export default function App() {
         }
     };
 
-    // --- 3. GESTIÓN DE VARIANTES (ADMIN) ---
+
     const handleAddVariant = async (newVariant: any) => {
         try {
             await api.post('/variantes', newVariant);
@@ -121,7 +121,7 @@ export default function App() {
         alert("La eliminación de variantes no está implementada en esta demo.");
     };
 
-    // --- 4. GESTIÓN DE COTIZACIONES (CLIENTE) ---
+
     const handleAddToQuote = (furnitureItem: Furniture, variant: Variant) => {
         setQuoteItems(prev => {
             const existingIndex = prev.findIndex(
@@ -130,7 +130,7 @@ export default function App() {
 
             if (existingIndex >= 0) {
                 const newItems = [...prev];
-                // Validamos contra el stock real que viene de la BD
+
                 if (newItems[existingIndex].quantity < furnitureItem.stock) {
                     newItems[existingIndex].quantity += 1;
                     return newItems;
@@ -165,7 +165,7 @@ export default function App() {
     const handleSubmitQuote = async () => {
         if (quoteItems.length === 0) return;
 
-        // Preparamos el JSON exacto que pide el Backend
+
         const payload = {
             detalles: quoteItems.map(item => ({
                 idMueble: item.furniture.idMueble,
@@ -177,24 +177,24 @@ export default function App() {
         try {
             await api.post('/cotizaciones', payload);
             alert('¡Cotización enviada exitosamente!');
-            setQuoteItems([]); // Limpiar carrito
+            setQuoteItems([]);
             setView('catalog');
-            fetchData(); // Recargar para actualizar listas de admin
+            fetchData();
         } catch (error) {
             alert('Error al enviar la cotización.');
             console.error(error);
         }
     };
 
-    // --- 5. CONFIRMACIÓN DE VENTA (ADMIN) ---
+
     const handleConfirmSale = async (quoteId: number) => {
         try {
-            // Llamamos al endpoint que descuenta stock
+
             await api.post(`/cotizaciones/${quoteId}/confirmar`);
             alert('¡Venta confirmada! Stock descontado.');
-            fetchData(); // Recargar para ver el stock actualizado y el estado de la cotización
+            fetchData();
         } catch (error: any) {
-            // Mostramos el mensaje de error del backend (ej: "Stock insuficiente")
+
             const msg = error.response?.data?.message || 'Error al confirmar venta';
             alert(msg);
         }
@@ -216,8 +216,8 @@ export default function App() {
                         position: 'fixed',
                         bottom: '20px',
                         left: '20px',
-                        backgroundColor: 'black', // Fondo Negro
-                        color: 'white',           // Texto Blanco
+                        backgroundColor: 'black',
+                        color: 'white',
                         padding: '12px 24px',
                         borderRadius: '50px',
                         border: '2px solid white',

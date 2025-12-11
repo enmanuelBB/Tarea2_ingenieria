@@ -24,17 +24,17 @@ export function ClientCatalog({
     const [selectedSize, setSelectedSize] = useState<string>('all');
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-    // Extraemos valores únicos basados en los datos reales del backend
+
     const types = ['all', ...Array.from(new Set(furniture.map(f => f.tipo)))];
     const materials = ['all', ...Array.from(new Set(furniture.map(f => f.material)))];
-    // Los tamaños vienen del Enum de Java (probablemente en mayúsculas)
+
     const sizes = ['all', ...Array.from(new Set(furniture.map(f => f.tamanio)))];
 
     const filteredFurniture = furniture.filter(item => {
-        // CAMBIO: Usamos nombreMueble en lugar de name
+
         const matchesSearch = item.nombreMueble.toLowerCase().includes(searchQuery.toLowerCase());
 
-        // CAMBIO: Usamos las propiedades en español que vienen del backend
+
         const matchesType = selectedType === 'all' || item.tipo === selectedType;
         const matchesMaterial = selectedMaterial === 'all' || item.material === selectedMaterial;
         const matchesSize = selectedSize === 'all' || item.tamanio === selectedSize;
