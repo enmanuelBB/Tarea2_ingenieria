@@ -212,10 +212,22 @@ export default function App() {
             {view !== 'admin' && (
                 <button
                     onClick={() => setView('admin')}
-                    style={{ zIndex: 9999 }} // Forzamos que esté siempre arriba
-                    className="fixed bottom-6 left-6 bg-black text-white px-6 py-3 rounded-full font-bold shadow-2xl border-2 border-white hover:bg-gray-800 transition-all flex items-center gap-2"
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        left: '20px',
+                        backgroundColor: 'black', // Fondo Negro
+                        color: 'white',           // Texto Blanco
+                        padding: '12px 24px',
+                        borderRadius: '50px',
+                        border: '2px solid white',
+                        fontWeight: 'bold',
+                        zIndex: 9999,
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+                    }}
                 >
-                    👮 Panel Admin
+                    Panel Admin
                 </button>
             )}
 
